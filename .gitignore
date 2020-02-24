@@ -1,0 +1,11 @@
+#No out files
+out/
+dataset/
+
+#No pycache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+#No pretrained models
+*.pth
