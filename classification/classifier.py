@@ -24,12 +24,13 @@ class Neural_Network:
 
 
 	def predict(self, json_data):
-		files = preprocessor.get_file_names(training_data)
+		print(json_data)
+		files = preprocessor.get_file_names(json_data)
 
-		if files == 1:
-			pose = preprocessor.calculate_poses(training_data, files)[0]
-			ratio = preprocessor.get_attr(training_data, files, 'ratio')[0]
-			return self.clf.predict([pose,ratio])
+		if len(files) == 1:
+			pose = preprocessor.calculate_poses(json_data, files)[0]
+			ratio = preprocessor.get_attr(json_data, files, 'ratio')[0]
+			return self.clf.predict([[pose,ratio]])
 		else:
 			raise ValueError("Too many values in alphapose json")
 

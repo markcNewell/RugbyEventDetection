@@ -4,14 +4,15 @@ from segmentation import segmentation
 from clusters import clusters
 from classification import classifier
 from pose_estimation import preprocessor
-from alphapose.scripts import demo_inference as di
-from alphapose.args import Args
+from alphapo.scripts import demo_inference as di
+from alphapo.args import Args
 
 #REQUIREMENTS
 import matplotlib.pyplot as plt
 import cv2
 import os
 import random
+import json
 
 
 
@@ -89,11 +90,12 @@ def main():
 
 
 			#Run through alphapose to get json of poses
-			json = di.main(Args("./configs/config.yaml", "./pretrained_models/fast_421_res152_256x192.pth"))
+			json_data = di.main(Args("./alphapo/configs/config.yaml", "./alphapo/pretrained_models/fast_421_res152_256x192.pth"), image_clusters[0])
+			json_data = json.loads(json_data)
 
 
 			#Classify
-			cluster = nn_classifier.predict(json)
+			cluster = nn_classifier.predict(json_data)
 
 
 			#Convert back to textual format

@@ -50,8 +50,8 @@ MODEL:
     NUM_CONV: 1
 DETECTOR:
   NAME: 'yolo'
-  CONFIG: 'detector/yolo/cfg/yolov3-spp.cfg'
-  WEIGHTS: 'detector/yolo/data/yolov3-spp.weights'
+  CONFIG: 'alphapo/detector/yolo/cfg/yolov3-spp.cfg'
+  WEIGHTS: 'alphapo/detector/yolo/data/yolov3-spp.weights'
   NMS_THRES: 0.6
   CONFIDENCE: 0.05
 TRAIN:
