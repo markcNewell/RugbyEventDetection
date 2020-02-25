@@ -1,3 +1,13 @@
+#CLUSTERING
+DISPLAY:
+  FONT: cv2.FONT_HERSHEY_SIMPLEX
+  FONT_SCALE: 1
+  FONT_COLOR: [255,0,0]
+  FONT_THICKNESS: 2
+  IN_DIR: "dataset/train/images/"
+  OUT_DIR: "output"
+
+#SEGMENTATION
 DATA:
   classes: 2
 
@@ -12,12 +22,75 @@ TEST:
   scales: [1.0]  # evaluation scales, ms as [0.5, 0.75, 1.0, 1.25, 1.5, 1.75]
   model_path: trained/pspnet/train_epoch_100.pth  # evaluation model path
 
-POSE:
- protoFile: trained/pose/pose_deploy_linevec.prototxt
- weightsFile: trained/pose/pose_iter_440000.caffemodel
- keypointsMapping: ['Nose', 'Neck', 'R-Sho', 'R-Elb', 'R-Wr', 'L-Sho', 'L-Elb', 'L-Wr', 'R-Hip', 'R-Knee', 'R-Ank', 'L-Hip', 'L-Knee', 'L-Ank', 'R-Eye', 'L-Eye', 'R-Ear', 'L-Ear']
- POSE_PAIRS: [[1,2], [1,5], [2,3], [3,4], [5,6], [6,7], [1,8], [8,9], [9,10], [1,11], [11,12], [12,13], [1,0], [0,14], [14,16], [0,15], [15,17], [2,17], [5,16]]
- mapIdx: [[31,32], [39,40], [33,34], [35,36], [41,42], [43,44], [19,20], [21,22], [23,24], [25,26], [27,28], [29,30], [47,48], [49,50], [53,54], [51,52], [55,56], [37,38], [45,46]]
- colors: [ [0,100,255], [0,100,255], [0,255,255], [0,100,255], [0,255,255], [0,100,255], [0,255,0], [255,200,100], [255,0,255], [0,255,0], [255,200,100], [255,0,255], [0,0,255], [255,0,0], [200,200,0], [255,0,0], [200,200,0], [0,0,0]]
- inHeight: 368
- nPoints: 18
+#ALPHAPOSE - Lot of junk here, don't change unless you know what you're doing
+DATASET:
+  TRAIN:
+    TYPE: 'Mscoco'
+    ROOT: './data/coco/'
+    IMG_PREFIX: 'train2017'
+    ANN: 'annotations/person_keypoints_train2017.json'
+    AUG:
+      FLIP: true
+      ROT_FACTOR: 40
+      SCALE_FACTOR: 0.3
+      NUM_JOINTS_HALF_BODY: 8
+      PROB_HALF_BODY: -1
+  VAL:
+    TYPE: 'Mscoco'
+    ROOT: './data/coco/'
+    IMG_PREFIX: 'val2017'
+    ANN: 'annotations/person_keypoints_val2017.json'
+  TEST:
+    TYPE: 'Mscoco_det'
+    ROOT: './data/coco/'
+    IMG_PREFIX: 'val2017'
+    DET_FILE: './exp/json/test_det_yolo.json'
+    ANN: 'annotations/person_keypoints_val2017.json'
+DATA_PRESET:
+  TYPE: 'simple'
+  SIGMA: 2
+  NUM_JOINTS: 17
+  IMAGE_SIZE:
+  - 256
+  - 192
+  HEATMAP_SIZE:
+  - 64
+  - 48
+MODEL:
+  TYPE: 'FastPose_DUC'
+  BACKBONE: 'se-resnet'
+  PRETRAINED: ''
+  TRY_LOAD: ''
+  NUM_DECONV_FILTERS:
+  - 256
+  - 256
+  - 256
+  NUM_LAYERS: 152
+  FINAL_CONV_KERNEL: 1
+  STAGE1:
+    NUM_CONV: 4
+  STAGE2:
+    NUM_CONV: 2
+  STAGE3:
+    NUM_CONV: 1
+DETECTOR:
+  NAME: 'yolo'
+  CONFIG: 'alphapo/detector/yolo/cfg/yolov3-spp.cfg'
+  WEIGHTS: 'alphapo/detector/yolo/data/yolov3-spp.weights'
+  NMS_THRES: 0.6
+  CONFIDENCE: 0.05
+TRAIN:
+  WORLD_SIZE: 4
+  BATCH_SIZE: 32
+  BEGIN_EPOCH: 0
+  END_EPOCH: 200
+  OPTIMIZER: 'adam'
+  LR: 0.001
+  LR_FACTOR: 0.1
+  LR_STEP:
+  - 90
+  - 120
+  DPG_MILESTONE: 140
+  DPG_STEP:
+  - 160
+  - 190

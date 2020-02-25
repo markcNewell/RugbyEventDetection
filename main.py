@@ -7,24 +7,17 @@ from pose_estimation import preprocessor
 from alphapo.scripts.alphapose import AlphaPose
 from alphapo.args import Args
 
-#REQUIREMENTS
+
+#PACKAGES
 import matplotlib.pyplot as plt
 import cv2
 import os
-import random
+import numpy as np
 import json
 
 
-
-FONT = cv2.FONT_HERSHEY_SIMPLEX
-FONTSCALE = 1
-FONTCOLOR = (255,0,0)
-FONTTHICKNESS = 2
-
-
-
 def main():
-	#Load config - TODO: add AlphaPose config to same file
+	#Load config
 	print("Loading configuration...", end="")
 	args = config.get_parser("./config/config.yaml")
 	print("Done")
@@ -38,7 +31,7 @@ def main():
 
 	#Initialise the pose estimator
 	print("Loading pose model...", end="")
-	ap = AlphaPose(Args("./configs/config.yaml", "./pretrained_models/fast_421_res152_256x192.pth"))
+	ap = AlphaPose(Args("./configs/config.yaml", "./alphapo/pretrained_models/fast_421_res152_256x192.pth"))
 	print("Done")
 
 
@@ -48,14 +41,8 @@ def main():
 	print("Done")
 
 
-	# Environmental variables - TODO: move to cmd command or to config file
-	in_dir = "dataset/train/images/"
-	out_dir = "masks"
-	poses = []
-
-
 	#Load in all the images from the in_dir folder
-	images = util.get_images(in_dir)
+	images = util.get_images(args.IN_DIR)
 
 
 	#For each image
@@ -67,8 +54,8 @@ def main():
 
 
 		#Setup paths
-		inpath = os.path.join(in_dir, image_path)
-		outpath = os.path.join(out_dir, image_path)
+		inpath = os.path.join(args.IN_DIR, image_path)
+		outpath = os.path.join(args.OUT_DIR, image_path)
 
 
 		#Load Image
@@ -78,11 +65,11 @@ def main():
 
 		#Predict mask
 		mask = predictor.predict(image)
-		mask.save(outpath)
 
 
-		#Reload mask in correct format
-		mask = cv2.imread(outpath, cv2.IMREAD_COLOR)
+		#Convert mask from PIL format to numpy/opencv
+		mask = np.array(mask)
+		mask = cv2.cvtColor(mask,cv2.COLOR_GRAY2RGB)
 
 
 		#Get clusters
@@ -121,12 +108,11 @@ def main():
 
 
 			#Draw bounding box and add tag annotation to original image
-			cv2.rectangle(image, (x, y), (x+w, y+h), FONTCOLOR, FONTTHICKNESS)
-			cv2.putText(image, tag[0], ((x+w+10),(y-10)), FONT, FONTSCALE, FONTCOLOR, FONTTHICKNESS)
+			cv2.rectangle(image, (x, y), (x+w, y+h), args.FONT_COLOR, args.FONT_THICKNESS)
+			cv2.putText(image, tag[0], ((x+w+10),(y-10)), args.FONT, args.FONT_SCALE, args.FONT_COLOR, args.FONT_THICKNESS)
 
 
-			plt.imsave(os.path.join('output', image_path), image)
-
+			plt.imsave(outpath, image)
 
 
 	#Print once again to show 100%
