@@ -4,7 +4,7 @@ class Args:
         self.checkpoint = checkpoint
         self.sp = True
         self.detector = "yolo"
-        self.inputpath = "./cluster_img/"
+        self.inputpath = "./"
         self.inputlist = ""
         self.inputimg = ""
         self.outputpath = "examples/res/"

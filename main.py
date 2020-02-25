@@ -31,7 +31,7 @@ def main():
 
 	#Initialise the pose estimator
 	print("Loading pose model...", end="")
-	ap = AlphaPose(Args("./configs/config.yaml", "./alphapo/pretrained_models/fast_421_res152_256x192.pth"))
+	ap = AlphaPose(Args("./config/config.yaml", "./alphapo/pretrained_models/fast_421_res152_256x192.pth"))
 	print("Done")
 
 
@@ -68,8 +68,12 @@ def main():
 
 
 		#Convert mask from PIL format to numpy/opencv
-		mask = np.array(mask)
-		mask = cv2.cvtColor(mask,cv2.COLOR_GRAY2RGB)
+		mask = np.array(mask) * 255
+		mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2RGB)
+		mask = cv2.bitwise_not(mask)
+
+
+		plt.imsave("./hey.png", mask)
 
 
 		#Get clusters

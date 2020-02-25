@@ -26,6 +26,8 @@ class Neural_Network:
 	def predict(self, json_data):
 		files = preprocessor.get_file_names(json_data)
 
+		print(json_data)
+
 		if len(files) == 1:
 			pose = preprocessor.calculate_poses(json_data, files)[0]
 			ratio = preprocessor.get_attr(json_data, files, 'ratio')[0]

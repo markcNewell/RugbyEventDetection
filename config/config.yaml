@@ -1,21 +1,21 @@
 #CLUSTERING
 DISPLAY:
-  FONT: cv2.FONT_HERSHEY_SIMPLEX
-  FONT_SCALE: 1
+  FONT: 1 #cv2.FONT_HERSHEY_SIMPLEX
+  FONT_SCALE: 2
   FONT_COLOR: [255,0,0]
   FONT_THICKNESS: 2
   IN_DIR: "dataset/train/images/"
   OUT_DIR: "output"
 
 #SEGMENTATION
-DATA:
+SEGMENTATION_DATA:
   classes: 2
 
-TRAIN:
+SEGMENTATION_TRAIN:
   layers: 50
   zoom_factor: 8  # zoom factor for final prediction during training, be in [1, 2, 4, 8]
 
-TEST:
+SEGMENTATION_TEST:
   base_size: 512  # based size for scaling
   test_h: 473
   test_w: 473
