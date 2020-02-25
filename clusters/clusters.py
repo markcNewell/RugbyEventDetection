@@ -13,12 +13,12 @@ def extractclusters(mask, image):
     contours = []
 
   clusters = []
-  for contour in contours:
-      (x,y,w,h) = cv2.boundingRect(contour)
+  if len(contours) > 0:
+      (x,y,w,h) = cv2.boundingRect(contours[0])
 
       clusters.append(crop(image,x,y,w,h)) # crop the mask if going for segmentation or the image if bounding box
       
-  return clusters
+  return clusters,(x,y,w,h)
 
 
 

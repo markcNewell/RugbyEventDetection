@@ -9,7 +9,7 @@ import numpy as np
 import torch
 from tqdm import tqdm
 
-sys.path.append('./')
+sys.path.append('./alphapo')
 
 from detector.apis import get_detector
 from alphapose.models import builder

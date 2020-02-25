@@ -16,6 +16,13 @@ import json
 
 
 
+FONT = cv2.FONT_HERSHEY_SIMPLEX
+FONTSCALE = 1
+FONTCOLOR = (255,0,0)
+FONTTHICKNESS = 2
+
+
+
 def main():
 	#Load config - TODO: add AlphaPose config to same file
 	print("Loading configuration...", end="")
@@ -37,7 +44,7 @@ def main():
 
 	# Environmental variables - TODO: move to cmd command or to config file
 	in_dir = "dataset/train/images/"
-	out_dir = "out"
+	out_dir = "masks"
 	poses = []
 
 
@@ -74,7 +81,7 @@ def main():
 
 		#Get clusters
 		out = clusters.makemask(image,mask)
-		image_clusters = clusters.extractclusters(out,image)
+		image_clusters, dimentions = clusters.extractclusters(out,image)
 
 
 		if len(image_clusters) > 0:
@@ -86,7 +93,7 @@ def main():
 
 
 			#Save the cluster for visual debugging
-			plt.imsave(os.path.join('cluster_imgs',image_path),image_clusters[0])
+			#plt.imsave(os.path.join('cluster_imgs',image_path),image_clusters[0])
 
 
 			#Run through alphapose to get json of poses
@@ -96,13 +103,23 @@ def main():
 
 			#Classify
 			cluster = nn_classifier.predict(json_data)
+			#cluster = nn_classifier.clf.predict([[random.randint(0,400),random.randint(0,4)]]) #TESTING
 
 
 			#Convert back to textual format
 			tag = nn_classifier.le.inverse_transform(cluster)
 
 
-			print(tag)
+			#Unpack dimentions of cluster
+			x,y,w,h = dimentions
+
+
+			#Draw bounding box and add tag annotation to original image
+			cv2.rectangle(image, (x, y), (x+w, y+h), FONTCOLOR, FONTTHICKNESS)
+			cv2.putText(image, tag[0], ((x+w+10),(y-10)), FONT, FONTSCALE, FONTCOLOR, FONTTHICKNESS)
+
+			plt.imsave(os.path.join('output', image_path), image)
+
 
 
 	#Print once again to show 100%

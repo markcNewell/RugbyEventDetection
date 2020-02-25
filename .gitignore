@@ -1,5 +1,7 @@
 #No out files
-out/
+output/
+masks/
+cluster_imgs/
 dataset/
 
 #No pycache files

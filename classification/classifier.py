@@ -24,7 +24,6 @@ class Neural_Network:
 
 
 	def predict(self, json_data):
-		print(json_data)
 		files = preprocessor.get_file_names(json_data)
 
 		if len(files) == 1:
