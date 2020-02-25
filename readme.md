@@ -20,7 +20,7 @@ mkdir "./trained/pspnet"
 
 ### Install AlphaPose ###
 ```
-git clone https://github.com/MVIG-SJTU/AlphaPose.git
+git clone https://github.com/markcNewell/AlphaPose.git
 mv AlphaPose alphapo
 cd alphapo/
 export PATH=/usr/local/cuda/bin/:$PATH
