@@ -22,9 +22,9 @@ cd alphapo/
 
 #Install alphapose - this compiling may take some time
 export PATH=/usr/local/cuda/bin/:$PATH
-!export LD_LIBRARY_PATH=/usr/local/cuda/lib64/:$LD_LIBRARY_PATH
-!sudo apt-get install libyaml-dev
-!python setup.py build develop --user
+export LD_LIBRARY_PATH=/usr/local/cuda/lib64/:$LD_LIBRARY_PATH
+sudo apt-get install libyaml-dev
+python setup.py build develop --user
 ```
    
 Once the packages have all built, the pretrained models need to be downloaded from the [model storage](https://drive.google.com/open?id=1UDiy7WQNvZpQAh2sgWgI-o2B9eqiL7pW) and...
