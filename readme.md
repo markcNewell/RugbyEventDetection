@@ -27,9 +27,9 @@ export PATH=/usr/local/cuda/bin/:$PATH
 !python setup.py build develop --user
 ```
    
-Once the packages have all built, the pretrained models need to be downloaded from the [model storage](https://drive.google.com/open?id=1UDiy7WQNvZpQAh2sgWgI-o2B9eqiL7pW) 
+Once the packages have all built, the pretrained models need to be downloaded from the [model storage](https://drive.google.com/open?id=1UDiy7WQNvZpQAh2sgWgI-o2B9eqiL7pW) and...
    
-Put the `train_epoch_100.pth` file in `RugbyEventDetection/trained/pspnet/`
-Unzip the dataset `dataset.zip` to `RugbyEventDetection`
-Put the `yolov3-spp.weights` file in `RugbyEventDetection/alphapo/detector/yolo/data/`
-Put the `fast_421_res152_256x192.pth` in `RugbyEventDetection/alphapo/pretrained_models/`
+* Put the `train_epoch_100.pth` file in `RugbyEventDetection/trained/pspnet/`
+* Unzip the dataset `dataset.zip` to `RugbyEventDetection`
+* Put the `yolov3-spp.weights` file in `RugbyEventDetection/alphapo/detector/yolo/data/`
+* Put the `fast_421_res152_256x192.pth` in `RugbyEventDetection/alphapo/pretrained_models/`
