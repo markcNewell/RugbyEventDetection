@@ -8,7 +8,7 @@ class Args:
         self.inputlist = ""
         self.inputimg = ""
         self.outputpath = "examples/res/"
-        self.save_img = True
+        self.save_img = False
         self.vis = False
         self.profile = False
         self.format = "open"

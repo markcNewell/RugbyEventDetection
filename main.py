@@ -4,7 +4,7 @@ from segmentation import segmentation
 from clusters import clusters
 from classification import classifier
 from pose_estimation import preprocessor
-from alphapo.scripts import demo_inference as di
+from alphapo.scripts.alphapose import AlphaPose
 from alphapo.args import Args
 
 #REQUIREMENTS
@@ -33,6 +33,12 @@ def main():
 	#Initialise the segmentation predictor once to hold model for all predictions
 	print("Loading segmentation model...", end="")
 	predictor = segmentation.SegmentationPredictor(args)
+	print("Done")
+
+
+	#Initialise the pose estimator
+	print("Loading pose model...", end="")
+	ap = AlphaPose(Args("./configs/config.yaml", "./pretrained_models/fast_421_res152_256x192.pth"))
 	print("Done")
 
 
@@ -85,7 +91,7 @@ def main():
 
 
 		if len(image_clusters) > 0:
-			#Just work with single biggest cluster for now
+			#Just work with single biggest cluster
 
 
 			if 0 in image_clusters[0].shape:
@@ -97,7 +103,7 @@ def main():
 
 
 			#Run through alphapose to get json of poses
-			json_data = di.main(Args("./alphapo/configs/config.yaml", "./alphapo/pretrained_models/fast_421_res152_256x192.pth"), image_clusters[0])
+			json_data = ap.predict(image_clusters[0])
 			json_data = json.loads(json_data)
 
 
@@ -117,6 +123,7 @@ def main():
 			#Draw bounding box and add tag annotation to original image
 			cv2.rectangle(image, (x, y), (x+w, y+h), FONTCOLOR, FONTTHICKNESS)
 			cv2.putText(image, tag[0], ((x+w+10),(y-10)), FONT, FONTSCALE, FONTCOLOR, FONTTHICKNESS)
+
 
 			plt.imsave(os.path.join('output', image_path), image)
 

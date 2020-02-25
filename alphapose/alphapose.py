@@ -1,4 +1,3 @@
-"""Script for single-gpu/multi-gpu demo."""
 import argparse
 import os
 import platform
@@ -9,7 +8,7 @@ import numpy as np
 import torch
 from tqdm import tqdm
 
-sys.path.append('./')
+sys.path.append('./alphapo')
 
 from detector.apis import get_detector
 from alphapose.models import builder
@@ -26,8 +25,8 @@ from alphapose.utils.writer import DataWriter
 
 class AlphaPose:
     """docstring for ClassName"""
-    def __init__(self, arg):
-        cfg = update_config(args.cfg)
+    def __init__(self, args):
+        self.cfg = update_config(args.cfg)
 
         args.gpus = [int(i) for i in args.gpus.split(',')] if torch.cuda.device_count() >= 1 else [-1]
         args.device = torch.device("cuda:" + str(args.gpus[0]) if args.gpus[0] >= 0 else "cpu")
@@ -35,53 +34,23 @@ class AlphaPose:
         args.posebatch = args.posebatch * len(args.gpus)
         args.tracking = (args.detector == 'tracker')
 
-        if not args.sp:
-            torch.multiprocessing.set_start_method('forkserver', force=True)
-            torch.multiprocessing.set_sharing_strategy('file_system')
-
-
-
-        mode, input_source = self.check_input(args)
-
-        if not os.path.exists(args.outputpath):
-            os.makedirs(args.outputpath)
-
-
-        imlist = [cv2.imread("./input/frame000001.png")]
-
-        # Load detection loader
-        det_loader = DetectionLoader(input_source, imlist, get_detector(args), cfg, args, batchSize=args.detbatch, mode=mode).start()
+        self.mode, self.input_source = self.check_input(args)
 
         # Load pose model
-        pose_model = builder.build_sppe(cfg.MODEL, preset_cfg=cfg.DATA_PRESET)
+        self.pose_model = builder.build_sppe(self.cfg.MODEL, preset_cfg=self.cfg.DATA_PRESET)
 
         print(f'Loading pose model from {args.checkpoint}...')
-        pose_model.load_state_dict(torch.load(args.checkpoint, map_location=args.device))
+        self.pose_model.load_state_dict(torch.load(args.checkpoint, map_location=args.device))
 
         if len(args.gpus) > 1:
-            pose_model = torch.nn.DataParallel(pose_model, device_ids=args.gpus).to(args.device)
+            self.pose_model = torch.nn.DataParallel(self.pose_model, device_ids=args.gpus).to(args.device)
         else:
-            pose_model.to(args.device)
-        pose_model.eval()
-
-        runtime_profile = {
-            'dt': [],
-            'pt': [],
-            'pn': []
-        }
+            self.pose_model.to(args.device)
+        self.pose_model.eval()
 
         # Init data writer
         queueSize = args.qsize
-        writer = DataWriter(cfg, args, save_video=False, queueSize=queueSize).start()
-
-
-        data_len = det_loader.length
-        im_names_desc = tqdm(range(data_len), dynamic_ncols=True)
-
-        batchSize = args.posebatch
-        if args.flip:
-            batchSize = int(batchSize / 2)
-
+        self.writer = DataWriter(self.cfg, args, save_video=False, queueSize=queueSize).start()
         self.args = args
         
 
@@ -124,6 +93,24 @@ class AlphaPose:
 
 
     def predict(self, image):
+        args = self.args
+        # Load detection loader
+        det_loader = DetectionLoader(self.input_source, [image], get_detector(args), self.cfg, args, batchSize=args.detbatch, mode=self.mode).start()
+
+        runtime_profile = {
+            'dt': [],
+            'pt': [],
+            'pn': []
+        }
+
+        data_len = det_loader.length
+        im_names_desc = tqdm(range(data_len), dynamic_ncols=True)
+
+        batchSize = args.posebatch
+        if args.flip:
+            batchSize = int(batchSize / 2)
+
+
 
         try:
             for i in im_names_desc:
@@ -133,7 +120,7 @@ class AlphaPose:
                     if orig_img is None:
                         break
                     if boxes is None or boxes.nelement() == 0:
-                        writer.save(None, None, None, None, None, orig_img, os.path.basename(im_name))
+                        self.writer.save(None, None, None, None, None, orig_img, os.path.basename(im_name))
                         continue
                     if args.profile:
                         ckpt_time, det_time = getTime(start_time)
@@ -150,7 +137,7 @@ class AlphaPose:
                         inps_j = inps[j * batchSize:min((j + 1) * batchSize, datalen)]
                         if args.flip:
                             inps_j = torch.cat((inps_j, flip(inps_j)))
-                        hm_j = pose_model(inps_j)
+                        hm_j = self.pose_model(inps_j)
                         if args.flip:
                             hm_j_flip = flip_heatmap(hm_j[int(len(hm_j) / 2):], det_loader.joint_pairs, shift=True)
                             hm_j = (hm_j[0:int(len(hm_j) / 2)] + hm_j_flip) / 2
@@ -160,7 +147,7 @@ class AlphaPose:
                         ckpt_time, pose_time = getTime(ckpt_time)
                         runtime_profile['pt'].append(pose_time)
                     hm = hm.cpu()
-                    writer.save(boxes, scores, ids, hm, cropped_boxes, orig_img, os.path.basename(im_name))
+                    self.writer.save(boxes, scores, ids, hm, cropped_boxes, orig_img, os.path.basename(im_name))
 
                     if args.profile:
                         ckpt_time, post_time = getTime(ckpt_time)
@@ -173,26 +160,25 @@ class AlphaPose:
                             dt=np.mean(runtime_profile['dt']), pt=np.mean(runtime_profile['pt']), pn=np.mean(runtime_profile['pn']))
                     )
             self.print_finish_info(args)
-            while(writer.running()):
+            while(self.writer.running()):
                 time.sleep(1)
-                print('===========================> Rendering remaining ' + str(writer.count()) + ' images in the queue...')
-            writer.stop()
+                print('===========================> Rendering remaining ' + str(self.writer.count()) + ' images in the queue...')
+            self.writer.stop()
             det_loader.stop()
         except KeyboardInterrupt:
             self.print_finish_info(args)
             # Thread won't be killed when press Ctrl+C
             if args.sp:
                 det_loader.terminate()
-                while(writer.running()):
+                while(self.writer.running()):
                     time.sleep(1)
-                    print('===========================> Rendering remaining ' + str(writer.count()) + ' images in the queue...')
-                writer.stop()
+                    print('===========================> Rendering remaining ' + str(self.writer.count()) + ' images in the queue...')
+                self.writer.stop()
             else:
                 # subprocesses are killed, manually clear queues
-                writer.commit()
-                writer.clear_queues()
+                self.writer.commit()
+                self.writer.clear_queues()
                 # det_loader.clear_queues()
-        final_result = writer.results()
-        write_json(final_result, args.outputpath, form=args.format, for_eval=args.eval)
-        print("Results have been written to json.")
+        final_result = self.writer.results()
+        return write_json(final_result, args.outputpath, form=args.format, for_eval=args.eval)
 
