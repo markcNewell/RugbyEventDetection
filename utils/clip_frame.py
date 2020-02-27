@@ -13,7 +13,7 @@ while True:
 	# Now when you read the frame, you will be reading the 50th frame
 	success, frame = cap.read()
 	cv2.imwrite('frame' + str(start_frame_number) + '.png',frame)
-	start_frame_number += 100
+	start_frame_number += 1000
 	cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame_number)
 		
 

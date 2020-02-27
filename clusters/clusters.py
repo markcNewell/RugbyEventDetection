@@ -13,6 +13,7 @@ def extractclusters(mask, image):
     contours = []
 
   clusters = []
+  x,y,w,h = (0,0,0,0)
   if len(contours) > 0:
       (x,y,w,h) = cv2.boundingRect(contours[0])
 

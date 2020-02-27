@@ -73,9 +73,6 @@ def main():
 		mask = cv2.bitwise_not(mask)
 
 
-		plt.imsave("./hey.png", mask)
-
-
 		#Get clusters
 		out = clusters.makemask(image,mask)
 		image_clusters, dimentions = clusters.extractclusters(out,image)
