@@ -21,7 +21,7 @@ if __name__ == '__main__':
 	data = import_json('./results.json')
 	keys = list(data.keys())
 
-	files = get_filenames('../dataset/train/images/')
+	files = get_filenames('../utils/done/')
 
 	print(len(keys),len(files))
 
@@ -34,6 +34,7 @@ if __name__ == '__main__':
 	for file in files:
 		if file not in keys:
 			print("file:", file)
+			os.remove('../utils/done/'+file)
 
 
 

@@ -4,7 +4,7 @@ DISPLAY:
   FONT_SCALE: 2
   FONT_COLOR: [255,0,0]
   FONT_THICKNESS: 2
-  IN_DIR: "dataset/test/"
+  IN_DIR: "dataset/test/images/"
   OUT_DIR: "output"
 
 #SEGMENTATION

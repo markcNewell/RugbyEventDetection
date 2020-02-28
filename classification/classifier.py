@@ -27,9 +27,12 @@ class Neural_Network:
 		files = preprocessor.get_file_names(json_data)
 
 		if len(files) == 1:
-			pose = preprocessor.calculate_poses(json_data, files)[0]
-			ratio = preprocessor.get_attr(json_data, files, 'ratio')[0]
-			return self.clf.predict([[pose,ratio]])
+			poses = preprocessor.calculate_poses(json_data, files)
+			if len(poses) > 0:
+				ratio = preprocessor.get_attr(json_data, files, 'ratio')[0]
+				return self.clf.predict([[poses[0],ratio]])
+			else:
+				raise ValueError("Poses not found for file")
 		else:
 			raise ValueError("Too many values in alphapose json")
 

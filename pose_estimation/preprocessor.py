@@ -39,7 +39,9 @@ def calculate_poses(data, files):
 			if (pose != 0):
 				poses.append(pose)
 
-		all_poses.append(statistics.mean(poses))
+		if len(poses) > 0:
+			all_poses.append(statistics.mean(poses))
+
 
 
 	return all_poses

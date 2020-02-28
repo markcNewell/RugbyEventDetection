@@ -43,6 +43,7 @@ def main():
 
 	#Load in all the images from the in_dir folder
 	images = util.get_images(args.IN_DIR)
+	tags = {}
 
 
 	#For each image
@@ -50,6 +51,7 @@ def main():
 
 
 		#Debugging
+		print("PRINTING")
 		util.print_progress_bar(i,len(images),suffix="{}/{}".format(i,len(images)))
 
 
@@ -91,13 +93,16 @@ def main():
 
 
 			#Run through alphapose to get json of poses
-			json_data = ap.predict(image_clusters[0])
+			json_data = ap.predict(image_clusters[0], image_path)
 			json_data = json.loads(json_data)
 
 
 			#Classify
-			cluster = nn_classifier.predict(json_data)
-			#cluster = nn_classifier.clf.predict([[random.randint(0,400),random.randint(0,4)]]) #TESTING
+			try:
+				cluster = nn_classifier.predict(json_data)
+				#cluster = nn_classifier.clf.predict([[random.randint(0,400),random.randint(0,4)]]) #TESTING
+			except:
+				continue
 
 
 			#Convert back to textual format
@@ -113,11 +118,21 @@ def main():
 			cv2.putText(image, tag[0], ((x+w+10),(y-10)), args.FONT, args.FONT_SCALE, args.FONT_COLOR, args.FONT_THICKNESS)
 
 
+			#Save original image with bounding box and associated tag
 			plt.imsave(outpath, image)
 
 
+			#Update the ouput object with image tag
+			tags[image_path] = {"tag": tag[0]}
+
+
 	#Print once again to show 100%
-	util.print_progress_bar(i+1,len(images))
+	util.print_progress_bar(len(images),len(images))
+
+
+	#Output the results object
+	with open(os.path.join(args.OUT_DIR,"results.json"), "w") as file:
+		json.dump(tags, file)
 
 
 
