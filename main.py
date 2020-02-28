@@ -17,9 +17,11 @@ import json
 
 
 def main():
+	CONFIG_FILE = "./config/config.yaml"
+
 	#Load config
 	print("Loading configuration...", end="")
-	args = config.get_parser("./config/config.yaml")
+	args = config.get_parser(CONFIG_FILE)
 	print("Done")
 
 
@@ -31,13 +33,13 @@ def main():
 
 	#Initialise the pose estimator
 	print("Loading pose model...", end="")
-	ap = AlphaPose(Args("./config/config.yaml", "./alphapo/pretrained_models/fast_421_res152_256x192.pth"))
+	ap = AlphaPose(Args(CONFIG_FILE, args.POSE_MODEL))
 	print("Done")
 
 
 	#Initialise classification model
 	print("Loading classification model...", end="")
-	nn_classifier = classifier.Neural_Network("./dataset/train/annotations/train.json")
+	nn_classifier = classifier.Neural_Network(args.CLASSIFICATION_MODEL)
 	print("Done")
 
 

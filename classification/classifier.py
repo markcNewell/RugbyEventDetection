@@ -1,26 +1,33 @@
 from sklearn.neural_network import MLPClassifier
 from sklearn import preprocessing
 from pose_estimation import preprocessor
-import math, json
+import math, json, pickle
 
 
 
 
 class Neural_Network:
 	"""docstring for ClassName"""
-	def __init__(self, filename, hidden_layers=(6,)):
-		self.clf = MLPClassifier(solver='lbfgs', hidden_layer_sizes=hidden_layers, max_iter=1000000)
+	def __init__(self, filename, hidden_layers=(6,), training=False):
 		self.le = preprocessing.LabelEncoder()
 
-		x,y = self.split_dataset(filename)
-		y = self.le.fit_transform(y)
-		self.train(x,y)
-
-		print(self.clf.score(x,y), end="...")
+		if not training:
+			self.clf = pickle.load(open(filename, 'rb'))
+		else:
+			self.clf = MLPClassifier(solver='lbfgs', hidden_layer_sizes=hidden_layers, max_iter=1000000)
+			x,y = self.split_dataset(filename)
+			y = self.le.fit_transform(y)
+			self.train(x,y)
 
 
 	def train(self, dataset, results):
 		self.clf.fit(dataset, results)
+
+
+	def score(self, filename):
+		x,y = self.split_dataset(filename)
+		y = self.le.fit_transform(y)
+		return self.clf.score(x,y)
 
 
 	def predict(self, json_data):
