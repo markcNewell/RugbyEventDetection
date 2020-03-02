@@ -8,16 +8,13 @@ import math, json, pickle
 
 class Neural_Network:
 	"""docstring for ClassName"""
-	def __init__(self, filename, hidden_layers=(6,), training=False):
+	def __init__(self, filename, hidden_layers=(6,)):
 		self.le = preprocessing.LabelEncoder()
 
-		if not training:
-			self.clf = pickle.load(open(filename, 'rb'))
-		else:
-			self.clf = MLPClassifier(solver='lbfgs', hidden_layer_sizes=hidden_layers, max_iter=1000000)
-			x,y = self.split_dataset(filename)
-			y = self.le.fit_transform(y)
-			self.train(x,y)
+		self.clf = MLPClassifier(solver='lbfgs', hidden_layer_sizes=hidden_layers, max_iter=1000000)
+		x,y = self.split_dataset(filename)
+		y = self.le.fit_transform(y)
+		self.train(x,y)
 
 
 	def train(self, dataset, results):

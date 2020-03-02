@@ -4,13 +4,17 @@ DISPLAY:
   FONT_SCALE: 2
   FONT_COLOR: [255,0,0]
   FONT_THICKNESS: 2
-  IN_DIR: "dataset/test/images/"
-  OUT_DIR: "output"
+  IN_DIR: "./dataset/"
+  OUT_DIR: "./output"
 MAIN:
   POSE_MODEL:  "./alphapo/pretrained_models/fast_421_res152_256x192.pth"
   CLASSIFICATION_MODEL: "./trained/classification/10_epoch_trained.sav"
-DATASET:
   TEST_DATASET: "./dataset/test/annotations/test.json"
+  VIDEO_INPUT: True
+  VIDEO_FILE: "test.mp4"
+  IMAGE_INPUT: False
+  FRAMERATE: 10
+  EVALUATE: False
 
 #SEGMENTATION
 SEGMENTATION_DATA:

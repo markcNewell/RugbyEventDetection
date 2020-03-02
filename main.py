@@ -15,6 +15,8 @@ import os
 import numpy as np
 import json
 import datetime
+import pickle
+import shutil
 
 
 def main():
@@ -40,12 +42,30 @@ def main():
 
 	#Initialise classification model
 	print("Loading classification model...", end="")
-	nn_classifier = classifier.Neural_Network(args.CLASSIFICATION_MODEL)
+	nn_classifier = pickle.load(open(args.CLASSIFICATION_MODEL, 'rb'))
 	print("Done")
 
 
 	#Load in all the images from the in_dir folder
-	images = util.get_images(args.IN_DIR)
+	if (args.IMAGE_INPUT) & (not args.VIDEO_INPUT):
+
+		images = util.get_images(args.IN_DIR)
+
+	elif (args.VIDEO_INPUT) & (not args.IMAGE_INPUT):
+
+		#If working on a video convert the input video into a series of images
+		#Skipping certain frames in order to make it the correct framerate
+		#Given the option to reduce framerate as can be slow to process many frames
+		print("Converting video to input frames...", end="")
+		images = util.video_to_frames(args.IN_DIR, args.VIDEO_FILE, args.FRAMERATE)
+		args.IN_DIR = os.path.join(args.IN_DIR, "frames")
+		print("Done")
+
+	else:
+		raise ValueError("VIDEO input and IMAGE input can't happen simultaneously")
+
+
+	#Tags object to store data calculated
 	tags = {}
 
 
@@ -56,7 +76,6 @@ def main():
 
 
 		#Debugging
-		print("PRINTING")
 		util.print_progress_bar(i,len(images),suffix="{}/{}".format(i,len(images)))
 
 
@@ -82,7 +101,9 @@ def main():
 
 		#Get clusters
 		out = clusters.makemask(image,mask)
-		image_clusters, dimentions = clusters.extractclusters(out,image)
+		
+		image_clusters, dimentions = clusters.extractclusters(out,image,bounding=True)
+		plt.imsave("hey.png", image_clusters[0])
 
 
 		if len(image_clusters) > 0:
@@ -105,7 +126,6 @@ def main():
 			#Classify
 			try:
 				cluster = nn_classifier.predict(json_data)
-				#cluster = nn_classifier.clf.predict([[random.randint(0,400),random.randint(0,4)]]) #TESTING
 			except:
 				continue
 
@@ -142,25 +162,49 @@ def main():
 	#Output the results object
 	with open(os.path.join(args.OUT_DIR,"results.json"), "w") as file:
 		json.dump(tags, file)
+		
 
 
-	EVALUATE = True
-
-
-	if EVALUATE:
+	if args.EVALUATE:
 		acc = 0
-		data = util.import_json(args.TEST_DATASET)
+		data = preprocessor.import_json(args.TEST_DATASET)
 
 		for image in images:
-			if data[image]['tag'] == tags[image]['tag']:
-				acc += 1
+			try:
+				if data[image]['tag'] == tags[image]['tag']:
+					acc += 1
+			except:
+				continue;
 
 		acc = acc/len(images)
 
-		print(acc)
+		print("Acuracy on test dataset:", acc)
 
 
 	print("Time took:", end-start)
+
+
+	#If video input delete frames created and make new video from outputed frames
+	if args.VIDEO_INPUT:
+
+		#Delete frames folder
+		shutil.rmtree(args.IN_DIR, ignore_errors=False, onerror=None)
+
+
+		#make video
+		img_array = []
+		for filename in glob.glob(args.OUT_DIR + '/*.png'):
+		    img = cv2.imread(filename)
+		    height, width, layers = img.shape
+		    size = (width,height)
+		    img_array.append(img)
+
+		out = cv2.VideoWriter(os.path.join(args.OUT_DIR, 'output.mp4'),cv2.VideoWriter_fourcc(*'DIVX'), 15, size)
+ 
+		for i in range(len(img_array)):
+		    out.write(img_array[i])
+		out.release()
+
 
 
 

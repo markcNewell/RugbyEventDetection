@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from PIL import Image
+import cv2
 
 import torch
 from torch import nn
@@ -168,6 +169,37 @@ def get_images(in_dir):
       png_files.append(file)
 
   return png_files
+
+
+
+
+def video_to_frames(in_dir, file, framerate):
+    video = cv2.VideoCapture(os.path.join(in_dir,file))
+    fps = video.get(cv2.CAP_PROP_FPS)
+    frame_count = video.get(cv2.CAP_PROP_FRAME_COUNT)
+
+    out_dir = os.path.join(in_dir, "frames")
+
+    if not os.path.exists(out_dir):
+        os.mkdir(out_dir)
+
+    images = []
+
+    if (framerate < fps):
+        step = fps/framerate
+        frame_number = 0
+        
+        while frame_number < frame_count:
+            success, frame = video.read()
+            cv2.imwrite(os.path.join(out_dir, str(frame_number) + '.png'),frame)
+            frame_number += step
+            video.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
+    else:
+        raise ValueError("Target framerate higher than original")
+
+    video.release()
+
+    return get_images(out_dir)
 
 
 

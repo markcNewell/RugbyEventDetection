@@ -11,3 +11,4 @@ __pycache__/
 #No pretrained models
 *.pth
 *.sav
+*.zip
