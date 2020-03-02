@@ -14,6 +14,7 @@ import cv2
 import os
 import numpy as np
 import json
+import datetime
 
 
 def main():
@@ -50,6 +51,8 @@ def main():
 
 	#For each image
 	for i, image_path in enumerate(images):
+
+		start = datetime.datetime.now()
 
 
 		#Debugging
@@ -128,6 +131,10 @@ def main():
 			tags[image_path] = {"tag": tag[0]}
 
 
+	end = datetime.datetime.now()
+
+
+
 	#Print once again to show 100%
 	util.print_progress_bar(len(images),len(images))
 
@@ -135,6 +142,25 @@ def main():
 	#Output the results object
 	with open(os.path.join(args.OUT_DIR,"results.json"), "w") as file:
 		json.dump(tags, file)
+
+
+	EVALUATE = True
+
+
+	if EVALUATE:
+		acc = 0
+		data = util.import_json(args.TEST_DATASET)
+
+		for image in images:
+			if data[image]['tag'] == tags[image]['tag']:
+				acc += 1
+
+		acc = acc/len(images)
+
+		print(acc)
+
+
+	print("Time took:", end-start)
 
 
 

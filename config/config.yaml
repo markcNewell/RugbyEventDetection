@@ -9,6 +9,8 @@ DISPLAY:
 MAIN:
   POSE_MODEL:  "./alphapo/pretrained_models/fast_421_res152_256x192.pth"
   CLASSIFICATION_MODEL: "./trained/classification/10_epoch_trained.sav"
+DATASET:
+  TEST_DATASET: "./dataset/test/annotations/test.json"
 
 #SEGMENTATION
 SEGMENTATION_DATA:
