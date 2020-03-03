@@ -14,7 +14,7 @@ final_classifier = 0
 print("Begining training process with", ITERATIONS, "interations")
 
 for c in range(ITERATIONS):
-	nn_classifier = classifier.Neural_Network(TRAIN_DATASET, training=True)
+	nn_classifier = classifier.Neural_Network(TRAIN_DATASET)
 	score = nn_classifier.score(TRAIN_DATASET)
 
 	if score > final_classifier_score: # Should be changed to test dataset

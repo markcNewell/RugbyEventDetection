@@ -17,6 +17,7 @@ import json
 import datetime
 import pickle
 import shutil
+import glob
 
 
 def main():
@@ -72,8 +73,6 @@ def main():
 	#For each image
 	for i, image_path in enumerate(images):
 
-		start = datetime.datetime.now()
-
 
 		#Debugging
 		util.print_progress_bar(i,len(images),suffix="{}/{}".format(i,len(images)))
@@ -103,7 +102,6 @@ def main():
 		out = clusters.makemask(image,mask)
 		
 		image_clusters, dimentions = clusters.extractclusters(out,image,bounding=True)
-		plt.imsave("hey.png", image_clusters[0])
 
 
 		if len(image_clusters) > 0:
@@ -143,15 +141,13 @@ def main():
 			cv2.putText(image, tag[0], ((x+w+10),(y-10)), args.FONT, args.FONT_SCALE, args.FONT_COLOR, args.FONT_THICKNESS)
 
 
-			#Save original image with bounding box and associated tag
-			plt.imsave(outpath, image)
-
-
 			#Update the ouput object with image tag
 			tags[image_path] = {"tag": tag[0]}
 
 
-	end = datetime.datetime.now()
+
+		#Save original image with bounding box and associated tag
+		plt.imsave(outpath, image)
 
 
 
@@ -180,8 +176,6 @@ def main():
 
 		print("Acuracy on test dataset:", acc)
 
-
-	print("Time took:", end-start)
 
 
 	#If video input delete frames created and make new video from outputed frames
