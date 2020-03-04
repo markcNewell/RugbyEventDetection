@@ -163,25 +163,30 @@ def colorize(gray, palette):
 
 def get_images(in_dir):
   png_files = []
+  images = []
   files = os.listdir(in_dir)
   for file in files:
     if file.endswith(".png"):
+        
       png_files.append(file)
+      images.append(cv2.imread(os.path.join(in_dir,file)))
 
-  return png_files
+  return zip(images,png_files)
 
 
 
 
 def video_to_frames(in_dir, file, framerate):
-    video = cv2.VideoCapture(os.path.join(in_dir,file))
+    images = []
+    file_names = []
+    video_file = os.path.join(in_dir,file)
+
+    if not os.path.exists(video_file):
+        raise ValueError("No such video file")
+
+    video = cv2.VideoCapture(video_file)
     fps = video.get(cv2.CAP_PROP_FPS)
     frame_count = video.get(cv2.CAP_PROP_FRAME_COUNT)
-
-    out_dir = os.path.join(in_dir, "frames")
-
-    if not os.path.exists(out_dir):
-        os.mkdir(out_dir)
 
     images = []
 
@@ -191,7 +196,10 @@ def video_to_frames(in_dir, file, framerate):
         
         while frame_number < frame_count:
             success, frame = video.read()
-            cv2.imwrite(os.path.join(out_dir, str(frame_number) + '.png'),frame)
+
+            file_names.append(os.path.join(out_dir, str(frame_number) + '.png'))
+            images.append(frame)
+
             frame_number += step
             video.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
     else:
@@ -199,7 +207,7 @@ def video_to_frames(in_dir, file, framerate):
 
     video.release()
 
-    return get_images(out_dir)
+    return zip(images, file_names)
 
 
 
@@ -224,3 +232,19 @@ def print_progress_bar(iteration, total, prefix = '', suffix = '', decimals = 1,
     # Print New Line on Complete
     if iteration == total: 
         print()
+
+
+
+def sort_filenames(path):
+    name = path.split("/")[1]
+    number = name.split(".")[0]
+    return int(number)
+
+
+def add_to_const_arr(arr, item, arr_size):
+    if len(arr) == arr_size:
+        arr.pop(0)
+
+    arr.append(item)
+
+    return arr

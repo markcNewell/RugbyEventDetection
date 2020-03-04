@@ -1,5 +1,5 @@
 #LOCAL
-from utils import config, util
+from utils import config, util, ui
 from segmentation import segmentation
 from clusters import clusters
 from classification import classifier
@@ -59,7 +59,6 @@ def main():
 		#Given the option to reduce framerate as can be slow to process many frames
 		print("Converting video to input frames...", end="")
 		images = util.video_to_frames(args.IN_DIR, args.VIDEO_FILE, args.FRAMERATE)
-		args.IN_DIR = os.path.join(args.IN_DIR, "frames")
 		print("Done")
 
 	else:
@@ -70,8 +69,13 @@ def main():
 	tags = {}
 
 
+	#Initialise data
+	i = 0
+	ruck = scrum = maul = lineout = []
+
+
 	#For each image
-	for i, image_path in enumerate(images):
+	for image, image_path in images:
 
 
 		#Debugging
@@ -84,7 +88,6 @@ def main():
 
 
 		#Load Image
-		image = cv2.imread(inpath, cv2.IMREAD_COLOR)
 		image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
 
@@ -124,12 +127,13 @@ def main():
 			#Classify
 			try:
 				cluster = nn_classifier.predict(json_data)
+				max_index = np.argmax(cluster[0])
 			except:
 				continue
 
 
 			#Convert back to textual format
-			tag = nn_classifier.le.inverse_transform(cluster)
+			tag = nn_classifier.le.inverse_transform([max_index])
 
 
 			#Unpack dimentions of cluster
@@ -138,7 +142,36 @@ def main():
 
 			#Draw bounding box and add tag annotation to original image
 			cv2.rectangle(image, (x, y), (x+w, y+h), args.FONT_COLOR, args.FONT_THICKNESS)
-			cv2.putText(image, tag[0], ((x+w+10),(y-10)), args.FONT, args.FONT_SCALE, args.FONT_COLOR, args.FONT_THICKNESS)
+			cv2.putText(image, "{0}: {1:.3f}".format(tag[0],cluster[0][max_index]), ((x+w+10),(y-10)), args.FONT, args.FONT_SCALE, args.FONT_COLOR, args.FONT_THICKNESS)
+
+
+			#Draw predictions graph
+			if args.PREDITION_GRAPH:
+
+				#Create random sample data for now
+				ruck = util.add_to_const_arr(ruck, cluster[0][0], args.FRAME_HISTORY)
+				maul = util.add_to_const_arr(maul, cluster[0][1], args.FRAME_HISTORY)
+				scrum = util.add_to_const_arr(scrum, cluster[0][2], args.FRAME_HISTORY)
+				lineout = util.add_to_const_arr(lineout, cluster[0][3], args.FRAME_HISTORY)
+
+
+				#Calculate overlay size based on UI_SCALE parameter
+				UI_SCALE = 1/args.UI_SCALE
+				overlay_dim = (int(image.shape[1]/(UI_SCALE * 10)), int(image.shape[0]/(UI_SCALE * 7)))
+
+
+				#Create graph
+				fig = ui.plot_preditions_graph(ruck, maul, scrum, lineout)
+
+				#Convert to numpy array (cv2 format)
+				overlay = ui.get_img_from_fig(fig)
+
+				#Resize to correct dimentions
+				overlay = cv2.resize(overlay, overlay_dim)
+
+				#Overlay images
+				image = overlay_images(overlay, image)
+
 
 
 			#Update the ouput object with image tag
@@ -148,6 +181,9 @@ def main():
 
 		#Save original image with bounding box and associated tag
 		plt.imsave(outpath, image)
+
+
+		i += 1
 
 
 
@@ -160,12 +196,18 @@ def main():
 		json.dump(tags, file)
 		
 
-
+	#If evaluating on the test dataset
 	if args.EVALUATE:
 		acc = 0
+
+		#Get the test dataset as json
 		data = preprocessor.import_json(args.TEST_DATASET)
 
+
+		#For each image compare tag to predicted tag
 		for image in images:
+
+			#If both exist, otherwise add 0 as no cluster/poses of note were found on that image
 			try:
 				if data[image]['tag'] == tags[image]['tag']:
 					acc += 1
@@ -180,24 +222,29 @@ def main():
 
 	#If video input delete frames created and make new video from outputed frames
 	if args.VIDEO_INPUT:
-
-		#Delete frames folder
-		shutil.rmtree(args.IN_DIR, ignore_errors=False, onerror=None)
+		print("Processing output video...", end="")
 
 
 		#make video
+		img_file_arr = glob.glob('output/*.png')
+		img_file_arr.sort(key=util.sort_filenames)
+
 		img_array = []
-		for filename in glob.glob(args.OUT_DIR + '/*.png'):
+		for filename in img_file_arr:
 		    img = cv2.imread(filename)
 		    height, width, layers = img.shape
 		    size = (width,height)
 		    img_array.append(img)
 
-		out = cv2.VideoWriter(os.path.join(args.OUT_DIR, 'output.mp4'),cv2.VideoWriter_fourcc(*'DIVX'), 15, size)
- 
+
+		out = cv2.VideoWriter(os.path.join("output", 'output.mp4'),cv2.VideoWriter_fourcc(*'mp4v'), args.FRAMERATE, size)
+
+
 		for i in range(len(img_array)):
 		    out.write(img_array[i])
 		out.release()
+
+		print("Done")
 
 
 
