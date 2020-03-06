@@ -8,7 +8,7 @@ DISPLAY:
   IN_DIR: "./dataset/"
   OUT_DIR: "./output"
 
-  PREDITION_GRAPH: True
+  PREDITION_GRAPH: False
   UI_SCALE: 2
   FRAME_HISTORY: 5
 MAIN:
