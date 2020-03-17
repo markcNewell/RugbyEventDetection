@@ -79,7 +79,7 @@ def main():
 
 
 		#Debugging
-		util.print_progress_bar(i,len(images),suffix="{}/{}".format(i,len(images)))
+		#util.print_progress_bar(i,len(images),suffix="{}/{}".format(i,len(images)))
 
 
 		#Setup paths
@@ -104,7 +104,7 @@ def main():
 		#Get clusters
 		out = clusters.makemask(image,mask)
 		
-		image_clusters, dimentions = clusters.extractclusters(out,image,bounding=True)
+		image_clusters, dimentions = clusters.extractclusters(out,image,bounding=args.BOUNDING)
 
 
 		if len(image_clusters) > 0:
@@ -175,7 +175,7 @@ def main():
 
 
 			#Update the ouput object with image tag
-			tags[image_path] = {"tag": tag[0]}
+			tags[image_path] = {"tag": tag[0], "prob": cluster[0][max_index], "bbox": {"x": x, "y": y, "w": w, "h": h}}
 
 
 
@@ -188,7 +188,7 @@ def main():
 
 
 	#Print once again to show 100%
-	util.print_progress_bar(len(images),len(images))
+	#util.print_progress_bar(len(images),len(images))
 
 
 	#Output the results object

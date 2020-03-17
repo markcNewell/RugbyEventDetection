@@ -197,7 +197,7 @@ def video_to_frames(in_dir, file, framerate):
         while frame_number < frame_count:
             success, frame = video.read()
 
-            file_names.append(os.path.join(out_dir, str(frame_number) + '.png'))
+            file_names.append(str(frame_number) + '.png')
             images.append(frame)
 
             frame_number += step
