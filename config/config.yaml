@@ -22,6 +22,15 @@ MAIN:
   EVALUATE: False
   BOUNDING: False
 
+
+#YOLO
+YOLO_DATA:
+  YOLO_CFG: "model/model.cfg"
+  YOLO_WEIGHTS: "model/model.weights"
+  YOLO_DATA: "cfg/obj.data"
+
+
+
 #SEGMENTATION
 SEGMENTATION_DATA:
   classes: 2

@@ -1,5 +1,6 @@
 import util, config
 import cv2, os, json
+import argparse
 
 
 
@@ -59,7 +60,14 @@ def main(json_file, video_file, framerate):
 
 
 if __name__ == '__main__':
-	main("results.json", "test2.mp4", 10)
+	parser = argparse.ArgumentParser()
+
+	parser.add_argument('--json', dest='jsonfile', help='The json file produced by in the results')
+	parser.add_argument('--video', dest='videofile', help='The video file produced to produce the results')
+	parser.add_argument('--framerate', dest='framerate', default=10, help='The framerate the results were produced at')
+
+	args = parser.parse_args()
+	main(args.jsonfile, args.videofile, args.framerate)
 
 
 	

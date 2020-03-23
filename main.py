@@ -6,6 +6,7 @@ from classification import classifier
 from pose_estimation import preprocessor
 from alphapo.scripts.alphapose import AlphaPose
 from alphapo.args import Args
+from darknet.python import darknet as dn
 
 
 #PACKAGES
@@ -18,6 +19,8 @@ import datetime
 import pickle
 import shutil
 import glob
+import sys
+
 
 
 def main():
@@ -29,10 +32,20 @@ def main():
 	print("Done")
 
 
-	#Initialise the segmentation predictor once to hold model for all predictions
-	print("Loading segmentation model...", end="")
-	predictor = segmentation.SegmentationPredictor(args)
-	print("Done")
+	if args.BOUNDING:
+
+		#Initialise the yolo predictor once to hold model for all predictions
+		print("Loading yolo model...", end="")
+		net = dn.load_net(args.YOLO_CFG, args.YOLO_WEIGHTS, 0)
+		meta = dn.load_meta(args.YOLO_DATA)
+		print("Done")
+
+	else:
+
+		#Initialise the segmentation predictor once to hold model for all predictions
+		print("Loading segmentation model...", end="")
+		predictor = segmentation.SegmentationPredictor(args)
+		print("Done")
 
 
 	#Initialise the pose estimator
@@ -63,6 +76,7 @@ def main():
 
 	else:
 		raise ValueError("VIDEO input and IMAGE input can't happen simultaneously")
+		
 
 
 	#Tags object to store data calculated
@@ -92,19 +106,28 @@ def main():
 
 
 		#Predict mask
-		mask = predictor.predict(image)
+		if args.BOUNDING:
+			im = dn.array_to_image(image)
+			dn.rgbgr_image(im)
+			dimentions = dn.detect2(net, meta, im)
+			dimentions = np.array(dimentions)[:,2]
+
+			image_clusters = create_image_clusters(image, dimentions)
+
+		else:
+			mask = predictor.predict(image)
 
 
-		#Convert mask from PIL format to numpy/opencv
-		mask = np.array(mask) * 255
-		mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2RGB)
-		mask = cv2.bitwise_not(mask)
+			#Convert mask from PIL format to numpy/opencv
+			mask = np.array(mask) * 255
+			mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2RGB)
+			mask = cv2.bitwise_not(mask)
 
 
-		#Get clusters
-		out = clusters.makemask(image,mask)
-		
-		image_clusters, dimentions = clusters.extractclusters(out,image,bounding=args.BOUNDING)
+			#Get clusters
+			out = clusters.makemask(image,mask)
+			
+			image_clusters, dimentions = clusters.extractclusters(out,image)
 
 
 		if len(image_clusters) > 0:
