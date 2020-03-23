@@ -36,8 +36,8 @@ def main():
 
 		#Initialise the yolo predictor once to hold model for all predictions
 		print("Loading yolo model...", end="")
-		net = dn.load_net(args.YOLO_CFG, args.YOLO_WEIGHTS, 0)
-		meta = dn.load_meta(args.YOLO_DATA)
+		net = dn.load_net(bytes(args.YOLO_CFG, 'utf-8'), bytes(args.YOLO_WEIGHTS,'utf-8'), 0)
+		meta = dn.load_meta(bytes(args.YOLO_DATA,'utf-8'))
 		print("Done")
 
 	else:
@@ -112,7 +112,7 @@ def main():
 			dimentions = dn.detect2(net, meta, im)
 			dimentions = np.array(dimentions)[:,2]
 
-			image_clusters = create_image_clusters(image, dimentions)
+			image_clusters = clusters.create_image_clusters(image, dimentions)
 
 		else:
 			mask = predictor.predict(image)

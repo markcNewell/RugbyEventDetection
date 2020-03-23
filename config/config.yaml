@@ -20,14 +20,14 @@ MAIN:
   IMAGE_INPUT: False
   FRAMERATE: 10
   EVALUATE: False
-  BOUNDING: False
+  BOUNDING: True
 
 
 #YOLO
 YOLO_DATA:
-  YOLO_CFG: "model/model.cfg"
-  YOLO_WEIGHTS: "model/model.weights"
-  YOLO_DATA: "cfg/obj.data"
+  YOLO_CFG: "darknet/model/model.cfg"
+  YOLO_WEIGHTS: "darknet/model/model.weights"
+  YOLO_DATA: "darknet/cfg/obj.data"
 
 
 
