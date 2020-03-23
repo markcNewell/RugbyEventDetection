@@ -3,6 +3,8 @@ output/
 cluster_imgs/
 dataset/
 
+*.mp4
+
 #No pycache files
 __pycache__/
 *.py[cod]

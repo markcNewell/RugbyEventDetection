@@ -33,12 +33,16 @@ def extractclusters(mask, image, bounding=False):
 
 
 
-def create_image_clusters(image, dimentions):
+def create_image_clusters(image, dim):
   clusters = []
 
-  for dim in dimentions:
-    x,y,w,h = dim
-    clusters.append(crop(image,int(x),int(y),int(w),int(h)))
+  x,y,w,h = dim
+  
+  # Center
+  x = x - (w/2)
+  y = y - (h/2)
+
+  clusters.append(crop(image,int(x),int(y),int(w),int(h)))
 
   return clusters
 
