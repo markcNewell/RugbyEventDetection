@@ -50,7 +50,7 @@ def main():
 
 	#Initialise the pose estimator
 	print("Loading pose model...", end="")
-	ap = AlphaPose(Args(CONFIG_FILE, args.POSE_MODEL))
+	ap = AlphaPose(Args(cfg.config, args.POSE_MODEL))
 	print("Done")
 
 
@@ -86,7 +86,10 @@ def main():
 	#Initialise data
 	i = 0
 	ruck = scrum = maul = lineout = []
-	len_images = sum([1 for i in images])
+
+
+	images = list(images)
+	len_images = len(images)
 
 
 	#For each image
@@ -171,7 +174,11 @@ def main():
 
 
 			#Unpack dimentions of cluster
-			x,y,w,h = dimentions
+			x,y,w,h = dimentions[0]
+			x = int(x)
+			y = int(y)
+			w = int(w)
+			h = int(h)
 
 
 			#Draw bounding box and add tag annotation to original image

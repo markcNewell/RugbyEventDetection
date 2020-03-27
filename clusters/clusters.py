@@ -30,7 +30,7 @@ def extractclusters(mask, image):
 def create_image_clusters(image, dim):
   clusters = []
 
-  x,y,w,h = dim
+  x,y,w,h = dim[0]
   
   # Center
   x = x - (w/2)
