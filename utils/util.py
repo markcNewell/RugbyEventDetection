@@ -2,6 +2,7 @@ import os
 import numpy as np
 from PIL import Image
 import cv2
+import argparse
 
 import torch
 from torch import nn
@@ -248,3 +249,12 @@ def add_to_const_arr(arr, item, arr_size):
     arr.append(item)
 
     return arr
+
+
+
+def parse_cla():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--config', dest='config', help='The config file to initialise the system with')
+
+    return parser.parse_args()

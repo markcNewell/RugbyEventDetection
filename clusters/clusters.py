@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 
-def extractclusters(mask, image, bounding=False):
+def extractclusters(mask, image):
   gray = cv2.cvtColor(mask, cv2.COLOR_RGB2GRAY)
 
   (contours,_) = cv2.findContours(gray,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
@@ -17,13 +17,7 @@ def extractclusters(mask, image, bounding=False):
   if len(contours) > 0:
       (x,y,w,h) = cv2.boundingRect(contours[0])
 
-      # crop the mask if going for segmentation or the image if bounding box
-      if bounding:
-        croper = image
-      else:
-        croper = mask
-
-      clusters.append(crop(croper,x,y,w,h))
+      clusters.append(crop(mask,x,y,w,h))
       
   return clusters,(x,y,w,h)
 

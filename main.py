@@ -24,11 +24,11 @@ import sys
 
 
 def main():
-	CONFIG_FILE = "./config/config.yaml"
+	cfg = util.parse_cla() #"./config/config.yaml"
 
 	#Load config
 	print("Loading configuration...", end="")
-	args = config.get_parser(CONFIG_FILE)
+	args = config.get_parser(cfg.config)
 	print("Done")
 
 
@@ -86,6 +86,7 @@ def main():
 	#Initialise data
 	i = 0
 	ruck = scrum = maul = lineout = []
+	len_images = sum([1 for i in images])
 
 
 	#For each image
@@ -93,7 +94,7 @@ def main():
 
 
 		#Debugging
-		#util.print_progress_bar(i,len(images),suffix="{}/{}".format(i,len(images)))
+		util.print_progress_bar(i,len_images,suffix="{}/{}".format(i,len_images))
 
 
 		#Setup paths
@@ -105,15 +106,29 @@ def main():
 		image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
 
-		#Predict mask
+		#If using the bounding box YOLO
 		if args.BOUNDING:
+
+			#Convert to correct formay
 			im = dn.array_to_image(image)
 			dn.rgbgr_image(im)
+
+
+			#Get clusters
 			dimentions = dn.detect2(net, meta, im)
-			dimentions = np.array(dimentions)[:,2]
 
-			image_clusters = clusters.create_image_clusters(image, dimentions)
 
+			#If clusters detected crop image to cluster parts
+			if len(dimentions) > 0 :
+				dimentions = np.array(dimentions)[:,2]
+
+				image_clusters = clusters.create_image_clusters(image, dimentions)
+
+			else:
+				image_clusters = []
+
+
+		#If using segmentation mask PSPN
 		else:
 			mask = predictor.predict(image)
 
@@ -136,10 +151,6 @@ def main():
 
 			if 0 in image_clusters[0].shape:
 				continue
-
-
-			#Save the cluster for visual debugging
-			#plt.imsave(os.path.join('cluster_imgs',image_path),image_clusters[0])
 
 
 			#Run through alphapose to get json of poses
@@ -186,11 +197,14 @@ def main():
 				#Create graph
 				fig = ui.plot_preditions_graph(ruck, maul, scrum, lineout)
 
+
 				#Convert to numpy array (cv2 format)
 				overlay = ui.get_img_from_fig(fig)
 
+
 				#Resize to correct dimentions
 				overlay = cv2.resize(overlay, overlay_dim)
+
 
 				#Overlay images
 				image = overlay_images(overlay, image)
@@ -211,7 +225,7 @@ def main():
 
 
 	#Print once again to show 100%
-	#util.print_progress_bar(len(images),len(images))
+	util.print_progress_bar(len_images,len_images)
 
 
 	#Output the results object
@@ -237,7 +251,8 @@ def main():
 			except:
 				continue;
 
-		acc = acc/len(images)
+
+		acc = acc/len_images
 
 		print("Acuracy on test dataset:", acc)
 
@@ -248,10 +263,12 @@ def main():
 		print("Processing output video...", end="")
 
 
-		#make video
+		#Collate filenames to be made into video
 		img_file_arr = glob.glob('output/*.png')
 		img_file_arr.sort(key=util.sort_filenames)
 
+
+		#Open files into array
 		img_array = []
 		for filename in img_file_arr:
 		    img = cv2.imread(filename)
@@ -260,12 +277,15 @@ def main():
 		    img_array.append(img)
 
 
+		#Create video output file with parameters
 		out = cv2.VideoWriter(os.path.join("output", 'output.mp4'),cv2.VideoWriter_fourcc(*'mp4v'), args.FRAMERATE, size)
 
 
+		#Write frame array to the output video file
 		for i in range(len(img_array)):
 		    out.write(img_array[i])
 		out.release()
+
 
 		print("Done")
 
