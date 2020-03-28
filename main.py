@@ -118,7 +118,7 @@ def main():
 
 
 			#Get clusters
-			dimentions = dn.detect2(net, meta, im)
+			dimentions = dn.detect2(net, meta, im, thresh=.5, hier_thresh=.5, nms=.45)
 
 
 			#If clusters detected crop image to cluster parts
@@ -243,6 +243,7 @@ def main():
 	#If evaluating on the test dataset
 	if args.EVALUATE:
 		acc = 0
+		detections = 0
 
 		#Get the test dataset as json
 		data = preprocessor.import_json(args.TEST_DATASET)
@@ -253,6 +254,8 @@ def main():
 
 			#If both exist, otherwise add 0 as no cluster/poses of note were found on that image
 			try:
+				if data[image_path] == data[image_path]:
+					detections += 1
 				if data[image_path]['tag'] == tags[image_path]['tag']:
 					acc += 1
 			except:
@@ -261,6 +264,7 @@ def main():
 
 		acc = acc/len_images
 
+		print("Detections in test dataset:", detections)
 		print("Acuracy on test dataset:", acc)
 
 

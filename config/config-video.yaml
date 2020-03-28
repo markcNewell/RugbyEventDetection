@@ -1,0 +1,120 @@
+#CLUSTERING
+DISPLAY:
+  FONT: 1 #cv2.FONT_HERSHEY_SIMPLEX
+  FONT_SCALE: 2
+  FONT_COLOR: [255,0,0]
+  FONT_THICKNESS: 2
+
+  IN_DIR: "./dataset/test/images/"
+  OUT_DIR: "./output"
+
+  PREDITION_GRAPH: False
+  UI_SCALE: 2
+  FRAME_HISTORY: 5
+MAIN:
+  POSE_MODEL:  "./alphapo/pretrained_models/fast_421_res152_256x192.pth"
+  CLASSIFICATION_MODEL: "./trained/classification/10_epoch_trained.sav"
+  TEST_DATASET: "./dataset/test/annotations/test.json"
+  VIDEO_INPUT: False
+  VIDEO_FILE: "test.mp4"
+  IMAGE_INPUT: True
+  FRAMERATE: 10
+  EVALUATE: True
+  BOUNDING: True
+
+
+#YOLO
+YOLO_DATA:
+  YOLO_CFG: "darknet/model/model.cfg"
+  YOLO_WEIGHTS: "darknet/model/model.weights"
+  YOLO_DATA: "darknet/cfg/obj.data"
+
+
+
+#SEGMENTATION
+SEGMENTATION_DATA:
+  classes: 2
+
+SEGMENTATION_TRAIN:
+  layers: 50
+  zoom_factor: 8  # zoom factor for final prediction during training, be in [1, 2, 4, 8]
+
+SEGMENTATION_TEST:
+  base_size: 512  # based size for scaling
+  test_h: 473
+  test_w: 473
+  scales: [1.0]  # evaluation scales, ms as [0.5, 0.75, 1.0, 1.25, 1.5, 1.75]
+  model_path: trained/pspnet/train_epoch_100.pth  # evaluation model path
+
+#ALPHAPOSE - Lot of junk here, don't change unless you know what you're doing
+DATASET:
+  TRAIN:
+    TYPE: 'Mscoco'
+    ROOT: './data/coco/'
+    IMG_PREFIX: 'train2017'
+    ANN: 'annotations/person_keypoints_train2017.json'
+    AUG:
+      FLIP: true
+      ROT_FACTOR: 40
+      SCALE_FACTOR: 0.3
+      NUM_JOINTS_HALF_BODY: 8
+      PROB_HALF_BODY: -1
+  VAL:
+    TYPE: 'Mscoco'
+    ROOT: './data/coco/'
+    IMG_PREFIX: 'val2017'
+    ANN: 'annotations/person_keypoints_val2017.json'
+  TEST:
+    TYPE: 'Mscoco_det'
+    ROOT: './data/coco/'
+    IMG_PREFIX: 'val2017'
+    DET_FILE: './exp/json/test_det_yolo.json'
+    ANN: 'annotations/person_keypoints_val2017.json'
+DATA_PRESET:
+  TYPE: 'simple'
+  SIGMA: 2
+  NUM_JOINTS: 17
+  IMAGE_SIZE:
+  - 256
+  - 192
+  HEATMAP_SIZE:
+  - 64
+  - 48
+MODEL:
+  TYPE: 'FastPose_DUC'
+  BACKBONE: 'se-resnet'
+  PRETRAINED: ''
+  TRY_LOAD: ''
+  NUM_DECONV_FILTERS:
+  - 256
+  - 256
+  - 256
+  NUM_LAYERS: 152
+  FINAL_CONV_KERNEL: 1
+  STAGE1:
+    NUM_CONV: 4
+  STAGE2:
+    NUM_CONV: 2
+  STAGE3:
+    NUM_CONV: 1
+DETECTOR:
+  NAME: 'yolo'
+  CONFIG: 'alphapo/detector/yolo/cfg/yolov3-spp.cfg'
+  WEIGHTS: 'alphapo/detector/yolo/data/yolov3-spp.weights'
+  NMS_THRES: 0.6
+  CONFIDENCE: 0.05
+TRAIN:
+  WORLD_SIZE: 4
+  BATCH_SIZE: 32
+  BEGIN_EPOCH: 0
+  END_EPOCH: 200
+  OPTIMIZER: 'adam'
+  LR: 0.001
+  LR_FACTOR: 0.1
+  LR_STEP:
+  - 90
+  - 120
+  DPG_MILESTONE: 140
+  DPG_STEP:
+  - 160
+  - 190

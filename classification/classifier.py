@@ -8,8 +8,9 @@ import math, json, pickle
 
 class Neural_Network:
 	"""docstring for ClassName"""
-	def __init__(self, filename, hidden_layers=(6,)):
+	def __init__(self, filename, threshold, hidden_layers=(6,)):
 		self.le = preprocessing.LabelEncoder()
+		self.threshold = threshold
 
 		self.clf = MLPClassifier(solver='lbfgs', hidden_layer_sizes=hidden_layers, max_iter=1000000)
 		x,y = self.split_dataset(filename)
@@ -31,7 +32,7 @@ class Neural_Network:
 		files = preprocessor.get_file_names(json_data)
 
 		if len(files) == 1:
-			poses = preprocessor.calculate_poses(json_data, files)
+			poses = preprocessor.calculate_poses(json_data, files, self.threshold)
 			if len(poses) > 0:
 				ratio = preprocessor.get_attr(json_data, files, 'ratio')[0]
 				return self.clf.predict_proba([[poses[0],ratio]])
@@ -47,7 +48,7 @@ class Neural_Network:
 
 
 		files = preprocessor.get_file_names(training_data)
-		poses = preprocessor.calculate_poses(training_data, files)
+		poses = preprocessor.calculate_poses(training_data, files, self.threshold)
 		ratios = preprocessor.get_attr(training_data, files, 'ratio')
 		tags = preprocessor.get_attr(training_data, files, 'tag')
 

@@ -49,7 +49,7 @@ def calculate_poses(data, files):
 
 
 
-def calculate_pose(keypoints):
+def calculate_pose(keypoints, threshold):
 
 	neck_index = 1
 	l_hip_index = 8
@@ -82,10 +82,7 @@ def calculate_pose(keypoints):
 		keypoints[index(r_knee_index) + 2])
 
 
-	THRESHOLD = 0.3
-
-
-	if (neck[2] < THRESHOLD) | (l_hip[2] < THRESHOLD) | (l_knee[2] < THRESHOLD) | (r_hip[2] < THRESHOLD) | (r_knee[2] < THRESHOLD):
+	if (neck[2] < threshold) | (l_hip[2] < threshold) | (l_knee[2] < threshold) | (r_hip[2] < threshold) | (r_knee[2] < threshold):
 		return 0
 	else:
 		pairs = get_key_pairs(neck,l_hip,l_knee,r_hip,r_knee)
@@ -166,10 +163,10 @@ def get_indexes_for_tag(files, tags, t):
 
 
 
-def get_angles_and_ratios(filename):
+def get_angles_and_ratios(filename, threshold):
 	data = import_json(filename)
 	files = get_file_names(data)
-	poses = calculate_poses(data, files)
+	poses = calculate_poses(data, files, threshold)
 
 	ratios = get_attr(data, files, 'ratio')
 

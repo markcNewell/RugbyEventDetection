@@ -5,7 +5,7 @@ DISPLAY:
   FONT_COLOR: [255,0,0]
   FONT_THICKNESS: 2
 
-  IN_DIR: "./dataset/"
+  IN_DIR: "./dataset/test/images/"
   OUT_DIR: "./output"
 
   PREDITION_GRAPH: False
@@ -15,12 +15,12 @@ MAIN:
   POSE_MODEL:  "./alphapo/pretrained_models/fast_421_res152_256x192.pth"
   CLASSIFICATION_MODEL: "./trained/classification/10_epoch_trained.sav"
   TEST_DATASET: "./dataset/test/annotations/test.json"
-  VIDEO_INPUT: True
+  VIDEO_INPUT: False
   VIDEO_FILE: "test.mp4"
-  IMAGE_INPUT: False
+  IMAGE_INPUT: True
   FRAMERATE: 10
-  EVALUATE: False
-  BOUNDING: True
+  EVALUATE: True
+  BOUNDING: False
 
 
 #YOLO
