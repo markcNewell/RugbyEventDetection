@@ -253,6 +253,7 @@ def main():
 
 			#If both exist, otherwise add 0 as no cluster/poses of note were found on that image
 			try:
+				print(data[image]['tag'], tags[image]['tag'])
 				if data[image]['tag'] == tags[image]['tag']:
 					acc += 1
 			except:
