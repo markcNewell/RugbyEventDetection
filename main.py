@@ -249,12 +249,11 @@ def main():
 
 
 		#For each image compare tag to predicted tag
-		for image in images:
+		for image, image_path in images:
 
 			#If both exist, otherwise add 0 as no cluster/poses of note were found on that image
 			try:
-				print(data[image]['tag'], tags[image]['tag'])
-				if data[image]['tag'] == tags[image]['tag']:
+				if data[image_path]['tag'] == tags[image_path]['tag']:
 					acc += 1
 			except:
 				continue;
