@@ -40,7 +40,7 @@ def calculate_poses(data, files, threshold):
 				poses.append(pose)
 
 		if len(poses) > 0:
-			all_poses.append(statistics.mean(poses))
+			all_poses.append((file, statistics.mean(poses)))
 
 
 

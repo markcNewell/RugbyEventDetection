@@ -2,7 +2,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn import preprocessing
 from pose_estimation import preprocessor
 import math, json, pickle
-
+import numpy as np
 
 
 
@@ -49,11 +49,13 @@ class Neural_Network:
 
 		files = preprocessor.get_file_names(training_data)
 		poses = preprocessor.calculate_poses(training_data, files, self.threshold)
-		ratios = preprocessor.get_attr(training_data, files, 'ratio')
-		tags = preprocessor.get_attr(training_data, files, 'tag')
-
-		return [list(a) for a in zip(poses,ratios)], tags
-
-
-
 		
+		done_files = np.array(poses)[:,0]
+
+		done_poses = np.array(poses)[:,1]
+		done_poses = [float(p) for p in done_poses]
+
+		ratios = preprocessor.get_attr(training_data, done_files, 'ratio')
+		tags = preprocessor.get_attr(training_data, done_files, 'tag')
+
+		return [list(a) for a in zip(done_poses,ratios)], tags
