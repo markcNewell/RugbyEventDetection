@@ -146,6 +146,7 @@ def main():
 			out = clusters.makemask(image,mask)
 			
 			image_clusters, dimentions = clusters.extractclusters(out,image)
+			dimentions = [dimentions]
 
 
 		if len(image_clusters) > 0:

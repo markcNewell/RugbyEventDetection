@@ -1,7 +1,8 @@
 #Training
 
-ITERATIONS: 10
-TRAIN_DATASET: "./dataset/train/annotations/train.json"
-MODEL_OUTPUT_DIR: "./trained/classification/"
-THRESHOLD: 0.3
+TRAINING:
+  ITERATIONS: 10
+  TRAIN_DATASET: "./dataset/train/annotations/train.json"
+  MODEL_OUTPUT_DIR: "./trained/classification/"
+  THRESHOLD: 0.3
 

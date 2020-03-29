@@ -29,13 +29,13 @@ def index(i):
 
 
 
-def calculate_poses(data, files):
+def calculate_poses(data, files, threshold):
 	all_poses = []
 	for file in files:
 		poses = []
 		people = data[file]['people']
 		for person in people:
-			pose = calculate_pose(person['pose_keypoints_2d'])
+			pose = calculate_pose(person['pose_keypoints_2d'], threshold)
 			if (pose != 0):
 				poses.append(pose)
 
