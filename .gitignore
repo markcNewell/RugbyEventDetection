@@ -2,6 +2,7 @@
 output/
 cluster_imgs/
 dataset/
+results/
 
 *.mp4
 

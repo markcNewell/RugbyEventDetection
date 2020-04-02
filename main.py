@@ -20,6 +20,7 @@ import pickle
 import shutil
 import glob
 import sys
+import datetime
 
 
 
@@ -90,6 +91,7 @@ def main():
 
 	images = list(images)
 	len_images = len(images)
+	start = datetime.datetime.now()
 
 
 	#For each image
@@ -231,6 +233,9 @@ def main():
 		i += 1
 
 
+	end = datetime.datetime.now()
+	print("Runtime:", end-start)
+
 
 	#Print once again to show 100%
 	util.print_progress_bar(len_images,len_images)
@@ -255,7 +260,7 @@ def main():
 
 			#If both exist, otherwise add 0 as no cluster/poses of note were found on that image
 			try:
-				if data[image_path] == data[image_path]:
+				if image_path in tags.keys():
 					detections += 1
 				if data[image_path]['tag'] == tags[image_path]['tag']:
 					acc += 1

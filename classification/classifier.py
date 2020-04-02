@@ -35,7 +35,7 @@ class Neural_Network:
 			poses = preprocessor.calculate_poses(json_data, files, self.threshold)
 			if len(poses) > 0:
 				ratio = preprocessor.get_attr(json_data, files, 'ratio')[0]
-				return self.clf.predict_proba([[poses[0],ratio]])
+				return self.clf.predict_proba([[poses[0][1],ratio]])
 			else:
 				raise ValueError("Poses not found for file")
 		else:
