@@ -1,9 +1,6 @@
 #LOCAL
 from utils import config, util, ui
-from segmentation import segmentation
-from clusters import clusters
-from classification import classifier
-from pose_estimation import preprocessor
+from layers import segmentation, clusters, classifier, preprocessor
 from alphapo.scripts.alphapose import AlphaPose
 from alphapo.args import Args
 from darknet.python import darknet as dn

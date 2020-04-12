@@ -1,4 +1,4 @@
-from classification import classifier
+from layers import classifier
 from utils import config
 import pickle
 import os

@@ -1,4 +1,3 @@
-#!/bin/bash
 
 python training.py --config config/training.yaml
 

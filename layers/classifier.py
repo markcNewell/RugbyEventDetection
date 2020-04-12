@@ -1,6 +1,6 @@
 from sklearn.neural_network import MLPClassifier
 from sklearn import preprocessing
-from pose_estimation import preprocessor
+from layers import preprocessor
 import math, json, pickle
 import numpy as np
 
