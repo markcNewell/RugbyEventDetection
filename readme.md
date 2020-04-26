@@ -56,4 +56,4 @@ A runner.sh script has been provided to showcase the running of the algorithm bu
 * `python training.py --config config/training.yaml`
 * `python main.py --config config/config-seg.yaml`
 
-As the processing takes a number of minutes for a short video an example has been provided () the results.json and video file should be downloaded. A script has been provided to combine the two. `postprocessor.py` should be run with the flags `--json` and `--video` pointing to the respecive file locations.
+As the processing takes a number of minutes for a short video an example has been provided () the results.json and video file should be downloaded. A script has been provided to combine the two. `postprocessor.py` should be run with the flags `--json`, `--config` and `--video` pointing to the respecive file locations.

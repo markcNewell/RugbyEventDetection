@@ -1,4 +1,4 @@
-import util, config
+from utils import util, config
 import cv2, os, json
 import argparse
 
@@ -16,8 +16,8 @@ def import_json(file):
 
 
 
-def main(json_file, video_file, framerate):
-	CONFIG_FILE = "../config/config.yaml"
+def main(json_file, video_file, framerate, config_loc):
+	CONFIG_FILE = config_loc
 
 	#Load config
 	print("Loading configuration...", end="")
@@ -65,9 +65,11 @@ if __name__ == '__main__':
 	parser.add_argument('--json', dest='jsonfile', help='The json file produced by in the results')
 	parser.add_argument('--video', dest='videofile', help='The video file produced to produce the results')
 	parser.add_argument('--framerate', dest='framerate', default=10, help='The framerate the results were produced at')
+	parser.add_argument('--config', dest='config', default='./config/config.yaml', help='The config to load')
+
 
 	args = parser.parse_args()
-	main(args.jsonfile, args.videofile, args.framerate)
+	main(args.jsonfile, args.videofile, args.framerate, args.config)
 
 
 	
