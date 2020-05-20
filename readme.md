@@ -1,4 +1,4 @@
-# Trivial Event Detection in Commertial Rugby Footage #
+# Event Detection in Commertial Rugby Footage #
 A dissertation project by Mark Newell to detect events such as rucks, mauls and scrums from commertial rugby footage using computer vision techniques. Uses parts from:
 1. Semseg - https://github.com/hszhao/semseg
 2. AlphaPose - https://github.com/MVIG-SJTU/AlphaPose
